@@ -30,10 +30,9 @@
   .animate-pulse-soft { animation: pulseSoft 1.6s ease-in-out infinite; }
 </style>
 </head>
-<body class="bg-neutral-100 min-h-screen text-neutral-800">
+<body class="bg-neutral-100 min-h-screen text-neutral-800 select-none">
 
-  <!-- ========================= HERO / HEADER ========================= -->
-  <header class="bg-hero-gradient text-white">
+  <header id="main-header" class="bg-hero-gradient text-white">
     <div class="max-w-3xl mx-auto px-6 py-12 text-center">
       <h1 class="text-3xl md:text-4xl font-bold tracking-tight">Kuis Bilangan Bulat</h1>
       <p class="mt-3 text-purple-100 md:text-lg">
@@ -44,7 +43,6 @@
 
   <main class="max-w-3xl mx-auto px-4 -mt-8 pb-16">
 
-    <!-- ========================= STEP 1: FORM DATA DIRI ========================= -->
     <section id="section-form" class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 fade-in">
       <h2 class="text-xl font-semibold text-neutral-800 mb-1">Langkah 1 — Data Diri</h2>
       <p class="text-sm text-neutral-500 mb-6">Isi data berikut sebelum memulai kuis.</p>
@@ -73,7 +71,6 @@
       </form>
     </section>
 
-    <!-- ========================= STEP 1.5: MENUNGGU IZIN ========================= -->
     <section id="section-waiting" class="hidden mt-6 fade-in">
       <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-10 text-center">
         <div class="mx-auto w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-5 animate-pulse-soft">
@@ -89,8 +86,11 @@
       </div>
     </section>
 
-    <!-- ========================= STEP 2: SOAL KUIS ========================= -->
     <section id="section-quiz" class="hidden mt-6 fade-in">
+      <div id="cheat-warning" class="hidden mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm font-semibold text-center animate-bounce">
+        ⚠️ PERINGATAN: Dilarang berpindah tab atau keluar dari mode layar penuh! (Pelanggaran: <span id="cheat-count">0</span>)
+      </div>
+
       <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8">
         <div class="flex items-center justify-between mb-2">
           <h2 class="text-xl font-semibold text-neutral-800">Langkah 2 — Soal Kuis</h2>
@@ -110,7 +110,6 @@
       </div>
     </section>
 
-    <!-- ========================= STEP 3: SCORE CARD ========================= -->
     <section id="section-result" class="hidden mt-6 fade-in">
       <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 text-center">
         <div class="mx-auto w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
@@ -125,6 +124,7 @@
           <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Email</span><span id="res-email" class="font-medium"></span></div>
           <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Jawaban Benar</span><span id="res-benar" class="font-medium"></span></div>
           <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Percobaan</span><span id="res-percobaan" class="font-medium"></span></div>
+          <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Pelanggaran / Out Focus</span><span id="res-pelanggaran" class="font-medium text-red-600">0 kali</span></div>
         </div>
 
         <div class="mt-6 bg-gradient-to-r from-purple-600 to-violet-500 rounded-xl py-6">
@@ -134,7 +134,6 @@
 
         <p id="save-status" class="text-xs text-neutral-400 mt-4"></p>
 
-        <!-- Tombol ulangi soal: hanya muncul setelah percobaan ke-1, tanpa perlu izin admin -->
         <div id="retry-container" class="mt-6 hidden">
           <button id="btn-retry"
             class="w-full bg-white border-2 border-purple-600 text-purple-600 font-semibold py-3 rounded-lg hover:bg-purple-50 transition">
@@ -143,7 +142,6 @@
           <p class="text-xs text-neutral-400 mt-2">Kamu punya 1 kali kesempatan mengulang tanpa perlu izin admin lagi.</p>
         </div>
 
-        <!-- Pembahasan: muncul setelah batas perulangan (percobaan ke-2) tercapai -->
         <div id="pembahasan-container" class="mt-8 hidden text-left">
           <h3 class="text-lg font-semibold text-neutral-800 mb-4">📖 Pembahasan Jawaban</h3>
           <div id="pembahasan-list" class="space-y-3"></div>
@@ -153,7 +151,6 @@
 
   </main>
 
-  <!-- ========================= FIREBASE (MODULAR v10) ========================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -166,32 +163,20 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // ============================================================
-    // 🔧 UBAH DI SINI: Konfigurasi Firebase kamu
-    // Ambil dari: Firebase Console > Project Settings > General > "Your apps" > SDK setup and configuration
-    // ============================================================
     const firebaseConfig = {
-  apiKey: "AIzaSyDJENdjNPj4b9G2nzl1X-C12iTv_oZpTl4",
-  authDomain: "kuis-mtk-app.firebaseapp.com",
-  projectId: "kuis-mtk-app",
-  storageBucket: "kuis-mtk-app.firebasestorage.app",
-  messagingSenderId: "546398118889",
-  appId: "1:546398118889:web:4185b0dbb1fdb46b2ca178"
-};
-    
+      apiKey: "AIzaSyDJENdjNPj4b9G2nzl1X-C12iTv_oZpTl4",
+      authDomain: "kuis-mtk-app.firebaseapp.com",
+      projectId: "kuis-mtk-app",
+      storageBucket: "kuis-mtk-app.firebasestorage.app",
+      messagingSenderId: "546398118889",
+      appId: "1:546398118889:web:4185b0dbb1fdb46b2ca178"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
-    // Nama koleksi Firestore yang dipakai bersama dengan halaman admin
     const KOLEKSI = "peserta";
-
-    // Batas maksimal percobaan (1 = normal, 2 = ulangan terakhir)
     const MAX_PERCOBAAN = 2;
 
-    // ============================================================
-    // 🔧 UBAH DI SINI: Daftar soal, opsi jawaban & kunci jawaban
-    // "answer" adalah index (0-3) dari array "options" yang benar
-    // ============================================================
     const soalList = [
       { question: "Hasil dari (-8) + 5 adalah...", options: ["-13", "-3", "3", "13"], answer: 1 },
       { question: "Hasil dari 12 - (-7) adalah...", options: ["5", "-5", "19", "-19"], answer: 2 },
@@ -215,14 +200,15 @@
       { question: "Hasil dari (-81) ÷ (-9) adalah...", options: ["-9", "9", "-72", "72"], answer: 1 }
     ];
 
-    // ============================================================
-    // State & elemen DOM
-    // ============================================================
     let userData = { nama: "", kelas: "", email: "" };
     let userAnswers = new Array(soalList.length).fill(null);
-    let sessionId = null;       // id dokumen Firestore untuk peserta ini
-    let percobaanKe = 1;        // percobaan ke berapa (1 = pertama, 2 = ulangan terakhir)
-    let unsubscribeIzin = null; // fungsi untuk berhenti mendengarkan status izin
+    let sessionId = null;
+    let percobaanKe = 1;
+    let unsubscribeIzin = null;
+
+    // Variabel Pengunci Layar & Anti-Cheat
+    let isExamActive = false;
+    let violationCount = 0;
 
     const sectionForm = document.getElementById("section-form");
     const sectionWaiting = document.getElementById("section-waiting");
@@ -243,7 +229,104 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // Render semua soal ke DOM
+    // ========================= EKSKLUSIF: MANTAPKAN SISTEM LOCKDOWN =========================
+    
+    // 1. Masuk Mode Fullscreen
+    function enterFullscreen() {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => console.log(err));
+      } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) { /* IE11 */
+        elem.msRequestFullscreen();
+      }
+    }
+
+    // 2. Keluar Mode Fullscreen
+    function exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.log(err));
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+
+    // 3. Mulai Penguncian Layar
+    function lockScreen() {
+      isExamActive = true;
+      enterFullscreen();
+
+      // Coba kunci keyboard jika didukung (Chrome/Edge)
+      if (navigator.keyboard && navigator.keyboard.lock) {
+        navigator.keyboard.lock(["Escape", "Tab", "MetaLeft", "MetaRight", "AltLeft", "AltRight"]);
+      }
+    }
+
+    // 4. Hentikan Penguncian Layar
+    function unlockScreen() {
+      isExamActive = false;
+      exitFullscreen();
+
+      if (navigator.keyboard && navigator.keyboard.unlock) {
+        navigator.keyboard.unlock();
+      }
+    }
+
+    // 5. Penanganan Pelanggaran (Pindah Tab / Alt+Tab / Keluar Fullscreen)
+    function handleViolation() {
+      if (!isExamActive) return;
+
+      violationCount++;
+      document.getElementById("cheat-count").textContent = violationCount;
+      document.getElementById("cheat-warning").classList.remove("hidden");
+
+      // Paksa masuk fullscreen lagi jika mereka keluar
+      setTimeout(() => {
+        if (isExamActive && !document.fullscreenElement) {
+          enterFullscreen();
+        }
+      }, 1000);
+    }
+
+    // Event Listener: Deteksi ganti Tab/Browser
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && isExamActive) {
+        handleViolation();
+      }
+    });
+
+    // Event Listener: Deteksi hilangnya fokus jendela
+    window.addEventListener("blur", () => {
+      if (isExamActive) {
+        handleViolation();
+      }
+    });
+
+    // Event Listener: Mencegah Klik Kanan & Kombinasi Tombol Pintas
+    document.addEventListener("contextmenu", (e) => {
+      if (isExamActive) e.preventDefault();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!isExamActive) return;
+
+      // Blokir F12, Ctrl+Shift+I, Alt+Tab, Ctrl+C, Ctrl+V, dll.
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
+        (e.ctrlKey && (e.key === "u" || e.key === "c" || e.key === "v" || e.key === "a")) ||
+        e.key === "Alt" ||
+        e.key === "Meta"
+      ) {
+        e.preventDefault();
+        handleViolation();
+      }
+    });
+
+    // RENDER SOAL KUIS
     function renderQuiz() {
       quizContainer.innerHTML = soalList.map((soal, qIndex) => `
         <div class="border-b border-neutral-200 pb-6 last:border-0 last:pb-0">
@@ -263,7 +346,6 @@
       attemptLabel.classList.toggle("hidden", percobaanKe < 2);
     }
 
-    // Dipanggil setiap kali user memilih jawaban
     window.__setAnswer = function (qIndex, oIndex) {
       userAnswers[qIndex] = oIndex;
       const answered = userAnswers.filter(a => a !== null).length;
@@ -271,13 +353,14 @@
       progressBar.style.width = `${(answered / soalList.length) * 100}%`;
     };
 
-    // Mulai kuis (dipanggil setelah admin memberi izin, atau saat user mengulang soal)
+    // MULAI KUIS + AKTIFKAN KUNCI LAYAR
     function mulaiKuis() {
       renderQuiz();
       showOnly(sectionQuiz);
+      lockScreen(); // <<-- Otomatis Mengunci Layar saat Masuk Ujian
     }
 
-    // ========================= STEP 1 -> MENUNGGU IZIN =========================
+    // STEP 1 -> MENUNGGU IZIN
     document.getElementById("form-data-diri").addEventListener("submit", async (e) => {
       e.preventDefault();
       userData.nama = document.getElementById("nama").value.trim();
@@ -288,7 +371,6 @@
       btnDaftar.textContent = "Mengirim data...";
 
       try {
-        // Buat dokumen peserta baru berstatus "menunggu_izin"
         const docRef = await addDoc(collection(db, KOLEKSI), {
           nama: userData.nama,
           kelas: userData.kelas,
@@ -301,8 +383,6 @@
 
         showOnly(sectionWaiting);
 
-        // Dengarkan perubahan status dokumen ini secara real-time.
-        // Begitu admin menekan tombol "Izinkan", status akan berubah menjadi "diizinkan".
         const sessionRef = doc(db, KOLEKSI, sessionId);
         unsubscribeIzin = onSnapshot(sessionRef, (snap) => {
           const data = snap.data();
@@ -319,13 +399,16 @@
       }
     });
 
-    // ========================= SUBMIT KUIS =========================
+    // SUBMIT KUIS + BUKA KUNCI LAYAR
     document.getElementById("btn-submit-quiz").addEventListener("click", async () => {
       const unanswered = userAnswers.filter(a => a === null).length;
       if (unanswered > 0) {
         const lanjut = confirm(`Masih ada ${unanswered} soal belum dijawab. Tetap submit?`);
         if (!lanjut) return;
       }
+
+      // Hentikan Kunci Layar
+      unlockScreen(); // <<-- Otomatis Membuka Layar saat Submit Selesai
 
       // Hitung skor
       let benar = 0;
@@ -340,6 +423,7 @@
       document.getElementById("res-email").textContent = userData.email;
       document.getElementById("res-benar").textContent = `${benar} / ${soalList.length}`;
       document.getElementById("res-percobaan").textContent = `${percobaanKe} / ${MAX_PERCOBAAN}`;
+      document.getElementById("res-pelanggaran").textContent = `${violationCount} kali`;
       document.getElementById("res-skor").textContent = skorAkhir;
 
       const bisaUlangi = percobaanKe < MAX_PERCOBAAN;
@@ -349,9 +433,7 @@
 
       showOnly(sectionResult);
 
-      // ============================================================
-      // Simpan hasil ke Firestore (update dokumen peserta yang sama)
-      // ============================================================
+      // Simpan hasil ke Firestore
       const statusEl = document.getElementById("save-status");
       try {
         if (sessionId) {
@@ -360,6 +442,7 @@
             percobaan: percobaanKe,
             jumlah_benar: benar,
             skor: skorAkhir,
+            pelanggaran: violationCount,
             waktu_selesai: serverTimestamp()
           });
         }
@@ -370,13 +453,12 @@
       }
     });
 
-    // ========================= ULANGI SOAL (tanpa izin admin, maks 1x) =========================
+    // RE-TRY / ULANGI SOAL
     document.getElementById("btn-retry").addEventListener("click", async () => {
-      if (percobaanKe >= MAX_PERCOBAAN) return; // pengaman tambahan
+      if (percobaanKe >= MAX_PERCOBAAN) return;
       percobaanKe += 1;
       userAnswers = new Array(soalList.length).fill(null);
 
-      // Update status di Firestore agar admin tahu peserta sedang mengulang
       try {
         if (sessionId) {
           await updateDoc(doc(db, KOLEKSI, sessionId), {
@@ -388,10 +470,9 @@
         console.error("Gagal memperbarui status percobaan:", err);
       }
 
-      mulaiKuis(); // langsung ke soal, tanpa halaman "Menunggu Izin"
+      mulaiKuis();
     });
 
-    // Tampilkan pembahasan jawaban tiap soal setelah batas perulangan tercapai
     function renderPembahasan() {
       pembahasanList.innerHTML = soalList.map((soal, i) => {
         const jawabanUser = userAnswers[i];
