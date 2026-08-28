@@ -6,32 +6,18 @@
 <title>Kuis Bilangan Bulat</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body {
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  }
-  .bg-hero-gradient {
-    background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 45%, #a78bfa 100%);
-  }
-  .fade-in {
-    animation: fadeIn .4s ease-in-out;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .option-label:has(input:checked) {
-    background-color: #ede9fe;
-    border-color: #8b5cf6;
-  }
-  @keyframes pulseSoft {
-    0%, 100% { opacity: 1; }
-    50% { opacity: .5; }
-  }
+  body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+  .bg-hero-gradient { background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 45%, #a78bfa 100%); }
+  .fade-in { animation: fadeIn .4s ease-in-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .option-label:has(input:checked) { background-color: #ede9fe; border-color: #8b5cf6; }
+  @keyframes pulseSoft { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
   .animate-pulse-soft { animation: pulseSoft 1.6s ease-in-out infinite; }
 </style>
 </head>
 <body class="bg-neutral-100 min-h-screen text-neutral-800 select-none">
 
+  <!-- ========================= HERO / HEADER ========================= -->
   <header id="main-header" class="bg-hero-gradient text-white">
     <div class="max-w-3xl mx-auto px-6 py-12 text-center">
       <h1 class="text-3xl md:text-4xl font-bold tracking-tight">Kuis Bilangan Bulat</h1>
@@ -43,6 +29,7 @@
 
   <main class="max-w-3xl mx-auto px-4 -mt-8 pb-16">
 
+    <!-- ========================= STEP 1: FORM DATA DIRI ========================= -->
     <section id="section-form" class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 fade-in">
       <h2 class="text-xl font-semibold text-neutral-800 mb-1">Langkah 1 — Data Diri</h2>
       <p class="text-sm text-neutral-500 mb-6">Isi data berikut sebelum memulai kuis.</p>
@@ -71,6 +58,7 @@
       </form>
     </section>
 
+    <!-- ========================= STEP 1.5: MENUNGGU IZIN ========================= -->
     <section id="section-waiting" class="hidden mt-6 fade-in">
       <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-10 text-center">
         <div class="mx-auto w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-5 animate-pulse-soft">
@@ -86,9 +74,11 @@
       </div>
     </section>
 
+    <!-- ========================= STEP 2: SOAL KUIS ========================= -->
     <section id="section-quiz" class="hidden mt-6 fade-in">
+      <!-- Peringatan Pelanggaran -->
       <div id="cheat-warning" class="hidden mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm font-semibold text-center animate-bounce">
-        ⚠️ PERINGATAN: Dilarang berpindah tab atau keluar dari mode layar penuh! (Pelanggaran: <span id="cheat-count">0</span>)
+        ⚠️ PERINGATAN: Dilarang berpindah tab / aplikasi lain! (Pelanggaran: <span id="cheat-count">0</span>)
       </div>
 
       <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8">
@@ -110,6 +100,7 @@
       </div>
     </section>
 
+    <!-- ========================= STEP 3: SCORE CARD ========================= -->
     <section id="section-result" class="hidden mt-6 fade-in">
       <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 text-center">
         <div class="mx-auto w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
@@ -124,7 +115,7 @@
           <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Email</span><span id="res-email" class="font-medium"></span></div>
           <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Jawaban Benar</span><span id="res-benar" class="font-medium"></span></div>
           <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Percobaan</span><span id="res-percobaan" class="font-medium"></span></div>
-          <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Pelanggaran / Out Focus</span><span id="res-pelanggaran" class="font-medium text-red-600">0 kali</span></div>
+          <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Pelanggaran Terdeteksi</span><span id="res-pelanggaran" class="font-medium text-red-600">0 kali</span></div>
         </div>
 
         <div class="mt-6 bg-gradient-to-r from-purple-600 to-violet-500 rounded-xl py-6">
@@ -134,6 +125,7 @@
 
         <p id="save-status" class="text-xs text-neutral-400 mt-4"></p>
 
+        <!-- Tombol ulangi soal -->
         <div id="retry-container" class="mt-6 hidden">
           <button id="btn-retry"
             class="w-full bg-white border-2 border-purple-600 text-purple-600 font-semibold py-3 rounded-lg hover:bg-purple-50 transition">
@@ -142,6 +134,7 @@
           <p class="text-xs text-neutral-400 mt-2">Kamu punya 1 kali kesempatan mengulang tanpa perlu izin admin lagi.</p>
         </div>
 
+        <!-- Pembahasan -->
         <div id="pembahasan-container" class="mt-8 hidden text-left">
           <h3 class="text-lg font-semibold text-neutral-800 mb-4">📖 Pembahasan Jawaban</h3>
           <div id="pembahasan-list" class="space-y-3"></div>
@@ -151,6 +144,7 @@
 
   </main>
 
+  <!-- ========================= FIREBASE (MODULAR v10) ========================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -159,6 +153,7 @@
       addDoc,
       doc,
       updateDoc,
+      arrayUnion,
       onSnapshot,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -206,9 +201,9 @@
     let percobaanKe = 1;
     let unsubscribeIzin = null;
 
-    // Variabel Pengunci Layar & Anti-Cheat
     let isExamActive = false;
     let violationCount = 0;
+    let lastViolationTime = 0;
 
     const sectionForm = document.getElementById("section-form");
     const sectionWaiting = document.getElementById("section-waiting");
@@ -229,21 +224,19 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // ========================= EKSKLUSIF: MANTAPKAN SISTEM LOCKDOWN =========================
+    // ========================= EKSKLUSIF: MANTAPKAN LOCKDOWN & PENCATATAN INSTAN =========================
     
-    // 1. Masuk Mode Fullscreen
     function enterFullscreen() {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
         elem.requestFullscreen().catch(err => console.log(err));
-      } else if (elem.webkitRequestFullscreen) { /* Safari */
+      } else if (elem.webkitRequestFullscreen) {
         elem.webkitRequestFullscreen();
-      } else if (elem.msRequestFullscreen) { /* IE11 */
+      } else if (elem.msRequestFullscreen) {
         elem.msRequestFullscreen();
       }
     }
 
-    // 2. Keluar Mode Fullscreen
     function exitFullscreen() {
       if (document.exitFullscreen) {
         document.exitFullscreen().catch(err => console.log(err));
@@ -254,18 +247,15 @@
       }
     }
 
-    // 3. Mulai Penguncian Layar
     function lockScreen() {
       isExamActive = true;
       enterFullscreen();
 
-      // Coba kunci keyboard jika didukung (Chrome/Edge)
       if (navigator.keyboard && navigator.keyboard.lock) {
         navigator.keyboard.lock(["Escape", "Tab", "MetaLeft", "MetaRight", "AltLeft", "AltRight"]);
       }
     }
 
-    // 4. Hentikan Penguncian Layar
     function unlockScreen() {
       isExamActive = false;
       exitFullscreen();
@@ -275,37 +265,58 @@
       }
     }
 
-    // 5. Penanganan Pelanggaran (Pindah Tab / Alt+Tab / Keluar Fullscreen)
-    function handleViolation() {
-      if (!isExamActive) return;
+    // PENCATATAN KECURANGAN INSTAN KE FIRESTORE (<1 DETIK)
+    async function handleViolation(jenisPelanggaran) {
+      if (!isExamActive || !sessionId) return;
+
+      // Anti-spam debounce (minimal interval 1.5 detik antar rincian event)
+      const now = Date.now();
+      if (now - lastViolationTime < 1500) return;
+      lastViolationTime = now;
 
       violationCount++;
+      const timeString = new Date().toLocaleTimeString('id-ID');
+
+      // 1. Tampilan Visual Lokal Peserta
       document.getElementById("cheat-count").textContent = violationCount;
       document.getElementById("cheat-warning").classList.remove("hidden");
 
-      // Paksa masuk fullscreen lagi jika mereka keluar
+      // 2. LANGSUNG KIRIM DATA KE FIRESTORE DALAM HITUNGAN MILIDETIK
+      try {
+        const sessionRef = doc(db, KOLEKSI, sessionId);
+        await updateDoc(sessionRef, {
+          pelanggaran: violationCount,
+          riwayat_pelanggaran: arrayUnion({
+            jenis: jenisPelanggaran,
+            waktu: timeString,
+            percobaan: percobaanKe
+          })
+        });
+      } catch (err) {
+        console.error("Gagal mengirim log kecurangan instan:", err);
+      }
+
+      // Paksa kembali Fullscreen jika mencoba keluar
       setTimeout(() => {
         if (isExamActive && !document.fullscreenElement) {
           enterFullscreen();
         }
-      }, 1000);
+      }, 800);
     }
 
-    // Event Listener: Deteksi ganti Tab/Browser
+    // LISTENERS DETEKSI KECURANGAN
     document.addEventListener("visibilitychange", () => {
       if (document.hidden && isExamActive) {
-        handleViolation();
+        handleViolation("Ganti Tab / Minimize Browser");
       }
     });
 
-    // Event Listener: Deteksi hilangnya fokus jendela
     window.addEventListener("blur", () => {
       if (isExamActive) {
-        handleViolation();
+        handleViolation("Layar Kehilangan Fokus (Out of Focus)");
       }
     });
 
-    // Event Listener: Mencegah Klik Kanan & Kombinasi Tombol Pintas
     document.addEventListener("contextmenu", (e) => {
       if (isExamActive) e.preventDefault();
     });
@@ -313,7 +324,6 @@
     document.addEventListener("keydown", (e) => {
       if (!isExamActive) return;
 
-      // Blokir F12, Ctrl+Shift+I, Alt+Tab, Ctrl+C, Ctrl+V, dll.
       if (
         e.key === "F12" ||
         (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
@@ -322,11 +332,10 @@
         e.key === "Meta"
       ) {
         e.preventDefault();
-        handleViolation();
+        handleViolation(`Pencetan Shortcut Dilarang (${e.key})`);
       }
     });
 
-    // RENDER SOAL KUIS
     function renderQuiz() {
       quizContainer.innerHTML = soalList.map((soal, qIndex) => `
         <div class="border-b border-neutral-200 pb-6 last:border-0 last:pb-0">
@@ -353,14 +362,13 @@
       progressBar.style.width = `${(answered / soalList.length) * 100}%`;
     };
 
-    // MULAI KUIS + AKTIFKAN KUNCI LAYAR
     function mulaiKuis() {
       renderQuiz();
       showOnly(sectionQuiz);
-      lockScreen(); // <<-- Otomatis Mengunci Layar saat Masuk Ujian
+      lockScreen();
     }
 
-    // STEP 1 -> MENUNGGU IZIN
+    // STEP 1 -> FORM REGISTRASI
     document.getElementById("form-data-diri").addEventListener("submit", async (e) => {
       e.preventDefault();
       userData.nama = document.getElementById("nama").value.trim();
@@ -377,6 +385,8 @@
           email: userData.email,
           status: "menunggu_izin",
           percobaan: 1,
+          pelanggaran: 0,
+          riwayat_pelanggaran: [],
           waktu_daftar: serverTimestamp()
         });
         sessionId = docRef.id;
@@ -386,7 +396,7 @@
         const sessionRef = doc(db, KOLEKSI, sessionId);
         unsubscribeIzin = onSnapshot(sessionRef, (snap) => {
           const data = snap.data();
-          if (data && data.status === "diizinkan" && sectionWaiting.classList.contains("hidden") === false) {
+          if (data && (data.status === "diizinkan" || data.status === "mengerjakan") && sectionWaiting.classList.contains("hidden") === false) {
             if (typeof unsubscribeIzin === "function") unsubscribeIzin();
             mulaiKuis();
           }
@@ -399,7 +409,7 @@
       }
     });
 
-    // SUBMIT KUIS + BUKA KUNCI LAYAR
+    // SUBMIT KUIS
     document.getElementById("btn-submit-quiz").addEventListener("click", async () => {
       const unanswered = userAnswers.filter(a => a === null).length;
       if (unanswered > 0) {
@@ -407,17 +417,14 @@
         if (!lanjut) return;
       }
 
-      // Hentikan Kunci Layar
-      unlockScreen(); // <<-- Otomatis Membuka Layar saat Submit Selesai
+      unlockScreen();
 
-      // Hitung skor
       let benar = 0;
       soalList.forEach((soal, i) => {
         if (userAnswers[i] === soal.answer) benar++;
       });
       const skorAkhir = Math.round((benar / soalList.length) * 100);
 
-      // Tampilkan score card
       document.getElementById("res-nama").textContent = userData.nama;
       document.getElementById("res-kelas").textContent = userData.kelas;
       document.getElementById("res-email").textContent = userData.email;
@@ -433,7 +440,6 @@
 
       showOnly(sectionResult);
 
-      // Simpan hasil ke Firestore
       const statusEl = document.getElementById("save-status");
       try {
         if (sessionId) {
