@@ -11,8 +11,7 @@
   .fade-in { animation: fadeIn .4s ease-in-out; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .option-label:has(input:checked) { background-color: #ede9fe; border-color: #8b5cf6; }
-  @keyframes pulseSoft { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-  .animate-pulse-soft { animation: pulseSoft 1.6s ease-in-out infinite; }
+  .palette-btn { width: 100%; aspect-ratio: 1 / 1; }
 </style>
 </head>
 <body class="bg-neutral-100 min-h-screen text-neutral-800 select-none">
@@ -22,15 +21,15 @@
     <div class="max-w-3xl mx-auto px-6 py-12 text-center">
       <h1 class="text-3xl md:text-4xl font-bold tracking-tight">Kuis Bilangan Bulat</h1>
       <p class="mt-3 text-purple-100 md:text-lg">
-        Uji pemahamanmu tentang operasi dan konsep bilangan bulat lewat 20 soal pilihan ganda berikut.
+        Uji pemahamanmu tentang operasi dan konsep bilangan bulat.
       </p>
     </div>
   </header>
 
-  <main class="max-w-3xl mx-auto px-4 -mt-8 pb-16">
+  <main class="max-w-5xl mx-auto px-4 -mt-8 pb-16">
 
     <!-- ========================= STEP 1: FORM DATA DIRI ========================= -->
-    <section id="section-form" class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 fade-in">
+    <section id="section-form" class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 fade-in">
       <h2 class="text-xl font-semibold text-neutral-800 mb-1">Langkah 1 — Data Diri</h2>
       <p class="text-sm text-neutral-500 mb-6">Isi data berikut sebelum memulai kuis.</p>
 
@@ -58,51 +57,64 @@
       </form>
     </section>
 
-    <!-- ========================= STEP 1.5: MENUNGGU IZIN ========================= -->
-    <section id="section-waiting" class="hidden mt-6 fade-in">
-      <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-10 text-center">
-        <div class="mx-auto w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-5 animate-pulse-soft">
-          <span class="text-3xl">⏳</span>
-        </div>
-        <h2 class="text-xl font-semibold text-neutral-800 mb-2">Menunggu Izin</h2>
-        <p class="text-sm text-neutral-500 max-w-sm mx-auto">
-          Data kamu sudah kami terima. Mohon tunggu sebentar, admin akan segera memberikan izin untuk memulai kuis ini.
-        </p>
-        <div class="mt-6 flex justify-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-4 border-purple-200 border-t-purple-600"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================= STEP 2: SOAL KUIS ========================= -->
+    <!-- ========================= STEP 2: SOAL KUIS (SATU PER SATU) ========================= -->
     <section id="section-quiz" class="hidden mt-6 fade-in">
       <!-- Peringatan Pelanggaran -->
       <div id="cheat-warning" class="hidden mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm font-semibold text-center animate-bounce">
         ⚠️ PERINGATAN: Dilarang berpindah tab / aplikasi lain! (Pelanggaran: <span id="cheat-count">0</span>)
       </div>
 
-      <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8">
-        <div class="flex items-center justify-between mb-2">
-          <h2 class="text-xl font-semibold text-neutral-800">Langkah 2 — Soal Kuis</h2>
-          <span id="progress-label" class="text-sm text-neutral-500">0 / 20 terjawab</span>
-        </div>
-        <p id="attempt-label" class="text-xs text-purple-600 font-medium mb-4 hidden">🔄 Ini adalah kesempatan ke-2 (terakhir) kamu mengerjakan kuis ini.</p>
-        <div class="w-full bg-neutral-200 rounded-full h-2 mb-6">
-          <div id="progress-bar" class="bg-gradient-to-r from-purple-600 to-violet-500 h-2 rounded-full transition-all" style="width:0%"></div>
+      <div class="grid md:grid-cols-[1fr_240px] gap-6 items-start">
+
+        <!-- Kartu Soal -->
+        <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-xl font-semibold text-neutral-800">Soal <span id="q-current">1</span> dari <span id="q-total">20</span></h2>
+            <span id="progress-label" class="text-sm text-neutral-500">0 / 20 terjawab</span>
+          </div>
+          <p id="attempt-label" class="text-xs text-purple-600 font-medium mb-4 hidden">🔄 Ini adalah kesempatan ke-2 (terakhir) kamu mengerjakan kuis ini.</p>
+          <div class="w-full bg-neutral-200 rounded-full h-2 mb-6">
+            <div id="progress-bar" class="bg-gradient-to-r from-purple-600 to-violet-500 h-2 rounded-full transition-all" style="width:0%"></div>
+          </div>
+
+          <div id="question-card">
+            <!-- Satu soal ditampilkan dinamik di sini -->
+          </div>
+
+          <div class="flex items-center justify-between mt-8 gap-3">
+            <button id="btn-prev"
+              class="px-5 py-2.5 rounded-lg font-semibold text-sm border border-neutral-300 text-neutral-600 hover:bg-neutral-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+              ← Sebelumnya
+            </button>
+            <button id="btn-next"
+              class="px-5 py-2.5 rounded-lg font-semibold text-sm bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-700 hover:to-violet-600 text-white transition">
+              Selanjutnya →
+            </button>
+          </div>
         </div>
 
-        <div id="quiz-container" class="space-y-6"></div>
+        <!-- Navigasi Soal (gaya olimpiade online) -->
+        <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-5 md:sticky md:top-4">
+          <h3 class="text-sm font-semibold text-neutral-800 mb-3">Navigasi Soal</h3>
+          <div id="question-palette" class="grid grid-cols-5 gap-2 mb-4"></div>
 
-        <button id="btn-submit-quiz"
-          class="w-full mt-8 bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-700 hover:to-violet-600 text-white font-semibold py-3 rounded-lg transition shadow-md">
-          Submit Jawaban
-        </button>
+          <div class="space-y-1.5 text-xs text-neutral-500 mb-5">
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-purple-600 inline-block"></span> Terjawab</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded border border-neutral-300 inline-block"></span> Belum dijawab</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded border-2 border-purple-600 inline-block"></span> Soal saat ini</div>
+          </div>
+
+          <button id="btn-submit-quiz"
+            class="w-full bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-700 hover:to-violet-600 text-white font-semibold py-3 rounded-lg transition shadow-md">
+            Submit Jawaban
+          </button>
+        </div>
       </div>
     </section>
 
     <!-- ========================= STEP 3: SCORE CARD ========================= -->
     <section id="section-result" class="hidden mt-6 fade-in">
-      <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 text-center">
+      <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 text-center">
         <div class="mx-auto w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
           <span class="text-3xl">🎉</span>
         </div>
@@ -154,7 +166,6 @@
       doc,
       updateDoc,
       arrayUnion,
-      onSnapshot,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -172,15 +183,20 @@
     const KOLEKSI = "peserta";
     const MAX_PERCOBAAN = 2;
 
+    // ============================================================
+    // BANK SOAL — tinggal tambahkan objek baru ke array ini untuk
+    // menambah soal (tidak dibatasi 20, bisa berapapun jumlahnya).
+    // Format: { question, options: [4 opsi], answer: index jawaban benar (0-3) }
+    // ============================================================
     const soalList = [
       { question: "Hasil dari (-8) + 5 adalah...", options: ["-13", "-3", "3", "13"], answer: 1 },
       { question: "Hasil dari 12 - (-7) adalah...", options: ["5", "-5", "19", "-19"], answer: 2 },
       { question: "Hasil dari (-6) × (-4) adalah...", options: ["-24", "24", "-10", "10"], answer: 1 },
       { question: "Hasil dari (-36) ÷ 6 adalah...", options: ["-6", "6", "-30", "30"], answer: 0 },
-      { question: "Jika a = -8, b = 5 dan c = -2 , maka nilai dari 2a + b - c   adalah...", options: ["9", "0", "-9", "-13"], answer: 2 },
+      { question: "Jika a = -8, b = 5 dan c = -2, maka nilai dari 2a + b - c adalah...", options: ["9", "0", "-9", "-13"], answer: 2 },
       { question: "Hasil dari 15 + (-9) - 4 adalah...", options: ["2", "10", "20", "-2"], answer: 0 },
-      { question: "KPK dan FPB  dari 24, 12 dan 36 adalah...", options: ["36 dan 12", "60 dan 24", "72 dan 12", "60 dan 12"], answer: 2 },
-      { question: "Hasil dari -5 * 8 + (-2) adalah...", options: ["30", "-30", "42", "-42"], answer: 3 },
+      { question: "KPK dan FPB dari 24, 12 dan 36 adalah...", options: ["36 dan 12", "60 dan 24", "72 dan 12", "60 dan 12"], answer: 2 },
+      { question: "Hasil dari -5 × 8 + (-2) adalah...", options: ["30", "-30", "42", "-42"], answer: 3 },
       { question: "Hasil dari 25 - 30 adalah...", options: ["5", "-5", "55", "-55"], answer: 1 },
       { question: "Hasil dari (-14) + (-6) adalah...", options: ["8", "-8", "20", "-20"], answer: 3 },
       { question: "Urutan bilangan bulat dari terkecil ke terbesar: -4, 2, -9, 0 adalah...", options: ["-9,-4,0,2", "0,-4,-9,2", "2,0,-4,-9", "-4,-9,0,2"], answer: 0 },
@@ -192,40 +208,51 @@
       { question: "Bilangan bulat negatif terbesar adalah...", options: ["-1", "0", "-100", "Tidak ada"], answer: 0 },
       { question: "Hasil dari (-2) × (-3) × (-4) adalah...", options: ["24", "-24", "9", "-9"], answer: 1 },
       { question: "Hasil dari 50 + (-20) - (-10) adalah...", options: ["20", "40", "60", "80"], answer: 1 },
-      { question: "Hasil dari (-81) ÷ (-9) adalah...", options: ["-9", "9", "-72", "72"], answer: 1 }
+      { question: "Hasil dari (-81) ÷ (-9) adalah...", options: ["-9", "9", "-72", "72"], answer: 1 },
+      { question: "Hasil dari (-15) + 20 - 8 adalah...", options: ["-3", "3", "13", "-13"], answer: 1 },
+      { question: "Hasil dari 9 × (-7) adalah...", options: ["63", "-63", "16", "-16"], answer: 1 },
+      { question: "Hasil dari (-100) ÷ 4 adalah...", options: ["25", "-25", "40", "-40"], answer: 1 },
+      { question: "Suhu di puncak gunung -12°C, lalu turun 5°C lagi. Suhu sekarang adalah...", options: ["-7°C", "-17°C", "7°C", "17°C"], answer: 1 },
+      { question: "Hasil dari (-3)³ adalah...", options: ["9", "-9", "27", "-27"], answer: 3 }
     ];
 
     let userData = { nama: "", kelas: "", email: "" };
     let userAnswers = new Array(soalList.length).fill(null);
+    let currentIndex = 0;
     let sessionId = null;
     let percobaanKe = 1;
-    let unsubscribeIzin = null;
 
     let isExamActive = false;
     let violationCount = 0;
     let lastViolationTime = 0;
 
     const sectionForm = document.getElementById("section-form");
-    const sectionWaiting = document.getElementById("section-waiting");
     const sectionQuiz = document.getElementById("section-quiz");
     const sectionResult = document.getElementById("section-result");
-    const quizContainer = document.getElementById("quiz-container");
+    const questionCard = document.getElementById("question-card");
+    const questionPalette = document.getElementById("question-palette");
+    const qCurrentEl = document.getElementById("q-current");
+    const qTotalEl = document.getElementById("q-total");
     const progressLabel = document.getElementById("progress-label");
     const progressBar = document.getElementById("progress-bar");
     const attemptLabel = document.getElementById("attempt-label");
     const btnDaftar = document.getElementById("btn-daftar");
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
     const retryContainer = document.getElementById("retry-container");
     const pembahasanContainer = document.getElementById("pembahasan-container");
     const pembahasanList = document.getElementById("pembahasan-list");
 
+    qTotalEl.textContent = soalList.length;
+
     function showOnly(section) {
-      [sectionForm, sectionWaiting, sectionQuiz, sectionResult].forEach(s => s.classList.add("hidden"));
+      [sectionForm, sectionQuiz, sectionResult].forEach(s => s.classList.add("hidden"));
       section.classList.remove("hidden");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // ========================= EKSKLUSIF: MANTAPKAN LOCKDOWN & PENCATATAN INSTAN =========================
-    
+    // ========================= LOCKDOWN & PENCATATAN INSTAN =========================
+
     function enterFullscreen() {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
@@ -265,11 +292,9 @@
       }
     }
 
-    // PENCATATAN KECURANGAN INSTAN KE FIRESTORE (<1 DETIK)
     async function handleViolation(jenisPelanggaran) {
       if (!isExamActive || !sessionId) return;
 
-      // Anti-spam debounce (minimal interval 1.5 detik antar rincian event)
       const now = Date.now();
       if (now - lastViolationTime < 1500) return;
       lastViolationTime = now;
@@ -277,11 +302,9 @@
       violationCount++;
       const timeString = new Date().toLocaleTimeString('id-ID');
 
-      // 1. Tampilan Visual Lokal Peserta
       document.getElementById("cheat-count").textContent = violationCount;
       document.getElementById("cheat-warning").classList.remove("hidden");
 
-      // 2. LANGSUNG KIRIM DATA KE FIRESTORE DALAM HITUNGAN MILIDETIK
       try {
         const sessionRef = doc(db, KOLEKSI, sessionId);
         await updateDoc(sessionRef, {
@@ -296,7 +319,6 @@
         console.error("Gagal mengirim log kecurangan instan:", err);
       }
 
-      // Paksa kembali Fullscreen jika mencoba keluar
       setTimeout(() => {
         if (isExamActive && !document.fullscreenElement) {
           enterFullscreen();
@@ -304,7 +326,6 @@
       }, 800);
     }
 
-    // LISTENERS DETEKSI KECURANGAN
     document.addEventListener("visibilitychange", () => {
       if (document.hidden && isExamActive) {
         handleViolation("Ganti Tab / Minimize Browser");
@@ -336,39 +357,95 @@
       }
     });
 
-    function renderQuiz() {
-      quizContainer.innerHTML = soalList.map((soal, qIndex) => `
-        <div class="border-b border-neutral-200 pb-6 last:border-0 last:pb-0">
-          <p class="font-medium text-neutral-800 mb-3">${qIndex + 1}. ${soal.question}</p>
-          <div class="grid sm:grid-cols-2 gap-2">
-            ${soal.options.map((opt, oIndex) => `
-              <label class="option-label flex items-center gap-2 border border-neutral-300 rounded-lg px-3 py-2 cursor-pointer hover:bg-neutral-50 transition text-sm">
-                <input type="radio" name="q${qIndex}" value="${oIndex}" class="accent-purple-600" onchange="window.__setAnswer(${qIndex}, ${oIndex})" />
-                <span>${opt}</span>
-              </label>
-            `).join("")}
-          </div>
+    // ========================= TAMPILAN SATU SOAL (STYLE OSN ONLINE) =========================
+
+    function renderQuestion() {
+      const soal = soalList[currentIndex];
+      const selected = userAnswers[currentIndex];
+
+      qCurrentEl.textContent = currentIndex + 1;
+
+      questionCard.innerHTML = `
+        <p class="font-medium text-neutral-800 mb-4 text-base">${currentIndex + 1}. ${soal.question}</p>
+        <div class="grid sm:grid-cols-2 gap-2">
+          ${soal.options.map((opt, oIndex) => `
+            <label class="option-label flex items-center gap-2 border border-neutral-300 rounded-lg px-3 py-2.5 cursor-pointer hover:bg-neutral-50 transition text-sm">
+              <input type="radio" name="current-question" value="${oIndex}" class="accent-purple-600"
+                ${selected === oIndex ? "checked" : ""} onchange="window.__setAnswer(${oIndex})" />
+              <span>${opt}</span>
+            </label>
+          `).join("")}
         </div>
-      `).join("");
-      progressLabel.textContent = `0 / ${soalList.length} terjawab`;
-      progressBar.style.width = "0%";
-      attemptLabel.classList.toggle("hidden", percobaanKe < 2);
+      `;
+
+      btnPrev.disabled = currentIndex === 0;
+      btnNext.textContent = currentIndex === soalList.length - 1 ? "Selesai →" : "Selanjutnya →";
+
+      renderPalette();
+      updateProgress();
     }
 
-    window.__setAnswer = function (qIndex, oIndex) {
-      userAnswers[qIndex] = oIndex;
+    function renderPalette() {
+      questionPalette.innerHTML = soalList.map((_, i) => {
+        const answered = userAnswers[i] !== null;
+        const isCurrent = i === currentIndex;
+        let cls = "palette-btn rounded-lg text-xs font-semibold flex items-center justify-center transition border ";
+        if (answered) {
+          cls += "bg-purple-600 text-white border-purple-600 ";
+        } else {
+          cls += "bg-white text-neutral-500 border-neutral-300 hover:bg-neutral-50 ";
+        }
+        if (isCurrent) {
+          cls += "ring-2 ring-offset-1 ring-purple-600";
+        }
+        return `<button data-index="${i}" class="btn-palette ${cls}">${i + 1}</button>`;
+      }).join("");
+    }
+
+    function updateProgress() {
       const answered = userAnswers.filter(a => a !== null).length;
       progressLabel.textContent = `${answered} / ${soalList.length} terjawab`;
       progressBar.style.width = `${(answered / soalList.length) * 100}%`;
+    }
+
+    window.__setAnswer = function (oIndex) {
+      userAnswers[currentIndex] = oIndex;
+      renderPalette();
+      updateProgress();
     };
 
+    questionPalette.addEventListener("click", (e) => {
+      const btn = e.target.closest(".btn-palette");
+      if (!btn) return;
+      currentIndex = parseInt(btn.dataset.index, 10);
+      renderQuestion();
+    });
+
+    btnPrev.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    });
+
+    btnNext.addEventListener("click", () => {
+      if (currentIndex < soalList.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        submitQuiz();
+      }
+    });
+
     function mulaiKuis() {
-      renderQuiz();
+      currentIndex = 0;
+      renderQuestion();
+      attemptLabel.classList.toggle("hidden", percobaanKe < 2);
       showOnly(sectionQuiz);
       lockScreen();
     }
 
-    // STEP 1 -> FORM REGISTRASI
+    // STEP 1 -> LANGSUNG MULAI KUIS (tanpa menunggu izin admin)
     document.getElementById("form-data-diri").addEventListener("submit", async (e) => {
       e.preventDefault();
       userData.nama = document.getElementById("nama").value.trim();
@@ -376,14 +453,14 @@
       userData.email = document.getElementById("email").value.trim();
 
       btnDaftar.disabled = true;
-      btnDaftar.textContent = "Mengirim data...";
+      btnDaftar.textContent = "Menyiapkan kuis...";
 
       try {
         const docRef = await addDoc(collection(db, KOLEKSI), {
           nama: userData.nama,
           kelas: userData.kelas,
           email: userData.email,
-          status: "menunggu_izin",
+          status: "mengerjakan",
           percobaan: 1,
           pelanggaran: 0,
           riwayat_pelanggaran: [],
@@ -391,16 +468,7 @@
         });
         sessionId = docRef.id;
 
-        showOnly(sectionWaiting);
-
-        const sessionRef = doc(db, KOLEKSI, sessionId);
-        unsubscribeIzin = onSnapshot(sessionRef, (snap) => {
-          const data = snap.data();
-          if (data && (data.status === "diizinkan" || data.status === "mengerjakan") && sectionWaiting.classList.contains("hidden") === false) {
-            if (typeof unsubscribeIzin === "function") unsubscribeIzin();
-            mulaiKuis();
-          }
-        });
+        mulaiKuis();
       } catch (err) {
         console.error("Gagal mendaftar:", err);
         alert("Gagal mengirim data. Periksa koneksi/konfigurasi Firebase lalu coba lagi.");
@@ -410,7 +478,7 @@
     });
 
     // SUBMIT KUIS
-    document.getElementById("btn-submit-quiz").addEventListener("click", async () => {
+    async function submitQuiz() {
       const unanswered = userAnswers.filter(a => a === null).length;
       if (unanswered > 0) {
         const lanjut = confirm(`Masih ada ${unanswered} soal belum dijawab. Tetap submit?`);
@@ -457,7 +525,9 @@
         console.error("Gagal menyimpan ke Firestore:", err);
         statusEl.textContent = "⚠️ Gagal menyimpan hasil. Periksa konfigurasi Firebase.";
       }
-    });
+    }
+
+    document.getElementById("btn-submit-quiz").addEventListener("click", submitQuiz);
 
     // RE-TRY / ULANGI SOAL
     document.getElementById("btn-retry").addEventListener("click", async () => {
