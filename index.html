@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+ <html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kuis PTS Matematika - Bangun Ruang Sisi Lengkung</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+  .bg-hero-gradient { background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 45%, #a78bfa 100%); }
+  .fade-in { animation: fadeIn .4s ease-in-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .option-label:has(input:checked) { background-color: #ede9fe; border-color: #8b5cf6; }
+  .palette-btn { width: 100%; aspect-ratio: 1 / 1; }
+</style>
+</head>
+<body class="bg-neutral-100 min-h-screen text-neutral-800 select-none">
+
+  <!-- ========================= HERO / HEADER ========================= -->
+  <header id="main-header" class="bg-hero-gradient text-white">
+    <div class="max-w-3xl mx-auto px-6 py-12 text-center">
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight">PTS Matematika Kelas IX</h1>
+      <p class="mt-3 text-purple-100 md:text-lg">
+        Bangun Ruang Sisi Lengkung — Tabung, Kerucut, dan Bola.
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 -mt-8 pb-16">
+
+    <!-- ========================= STEP 1: FORM DATA DIRI ========================= -->
+    <section id="section-form" class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 fade-in">
+      <h2 class="text-xl font-semibold text-neutral-800 mb-1">Langkah 1 — Data Diri</h2>
+      <p class="text-sm text-neutral-500 mb-6">Isi data berikut sebelum memulai kuis.</p>
+
+      <form id="form-data-diri" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-1" for="nama">Nama Lengkap</label>
+          <input required id="nama" type="text" placeholder="Masukkan nama lengkap"
+            class="w-full rounded-lg border border-neutral-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-1" for="kelas">Kelas / Departemen</label>
+          <input required id="kelas" type="text" placeholder="Contoh: VII-A / IT Support"
+            class="w-full rounded-lg border border-neutral-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-1" for="email">Email</label>
+          <input required id="email" type="email" placeholder="nama@email.com"
+            class="w-full rounded-lg border border-neutral-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" />
+        </div>
+
+        <button type="submit" id="btn-daftar"
+          class="w-full mt-2 bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-700 hover:to-violet-600 text-white font-semibold py-3 rounded-lg transition shadow-md disabled:opacity-60">
+          Mulai Kuis →
+        </button>
+      </form>
+    </section>
+
+    <!-- ========================= STEP 2: SOAL KUIS (SATU PER SATU) ========================= -->
+    <section id="section-quiz" class="hidden mt-6 fade-in">
+      <!-- Peringatan Pelanggaran -->
+      <div id="cheat-warning" class="hidden mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm font-semibold text-center animate-bounce">
+        ⚠️ PERINGATAN: Dilarang berpindah tab / aplikasi lain! (Pelanggaran: <span id="cheat-count">0</span>)
+      </div>
+
+      <div class="grid md:grid-cols-[1fr_240px] gap-6 items-start">
+
+        <!-- Kartu Soal -->
+        <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-xl font-semibold text-neutral-800">Soal <span id="q-current">1</span> dari <span id="q-total">20</span></h2>
+            <span id="progress-label" class="text-sm text-neutral-500">0 / 20 terjawab</span>
+          </div>
+          <p id="attempt-label" class="text-xs text-purple-600 font-medium mb-4 hidden">🔄 Ini adalah kesempatan ke-2 (terakhir) kamu mengerjakan kuis ini.</p>
+          <div class="w-full bg-neutral-200 rounded-full h-2 mb-6">
+            <div id="progress-bar" class="bg-gradient-to-r from-purple-600 to-violet-500 h-2 rounded-full transition-all" style="width:0%"></div>
+          </div>
+
+          <div id="question-card">
+            <!-- Satu soal ditampilkan dinamik di sini -->
+          </div>
+
+          <div class="flex items-center justify-between mt-8 gap-3">
+            <button id="btn-prev"
+              class="px-5 py-2.5 rounded-lg font-semibold text-sm border border-neutral-300 text-neutral-600 hover:bg-neutral-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+              ← Sebelumnya
+            </button>
+            <button id="btn-next"
+              class="px-5 py-2.5 rounded-lg font-semibold text-sm bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-700 hover:to-violet-600 text-white transition">
+              Selanjutnya →
+            </button>
+          </div>
+        </div>
+
+        <!-- Navigasi Soal (gaya olimpiade online) -->
+        <div class="bg-white rounded-2xl shadow-xl border border-neutral-200 p-5 md:sticky md:top-4">
+          <h3 class="text-sm font-semibold text-neutral-800 mb-3">Progres Soal</h3>
+          <div id="question-palette" class="grid grid-cols-5 gap-2 mb-4"></div>
+
+          <div class="space-y-1.5 text-xs text-neutral-500 mb-5">
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-purple-600 inline-block"></span> Soal saat ini</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-purple-100 border border-purple-300 inline-block"></span> Sudah dilewati, terjawab</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-white border border-neutral-300 inline-block"></span> Sudah dilewati, belum dijawab</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-neutral-50 border border-neutral-200 inline-block"></span> Belum sampai</div>
+          </div>
+          <p class="text-[11px] text-neutral-400 mb-2">Kotak ini hanya penanda progres, tidak bisa diklik untuk berpindah soal.</p>
+
+          <button id="btn-submit-quiz"
+            class="w-full bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-700 hover:to-violet-600 text-white font-semibold py-3 rounded-lg transition shadow-md">
+            Submit Jawaban
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= STEP 3: SCORE CARD ========================= -->
+    <section id="section-result" class="hidden mt-6 fade-in">
+      <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-neutral-200 p-6 md:p-8 text-center">
+        <div class="mx-auto w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+          <span class="text-3xl">🎉</span>
+        </div>
+        <h2 class="text-xl font-semibold text-neutral-800 mb-1">Hasil Kuis Kamu</h2>
+        <p class="text-sm text-neutral-500 mb-6">Terima kasih sudah mengerjakan kuis ini!</p>
+
+        <div class="bg-neutral-50 rounded-xl border border-neutral-200 divide-y divide-neutral-200 text-left overflow-hidden">
+          <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Nama</span><span id="res-nama" class="font-medium"></span></div>
+          <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Kelas</span><span id="res-kelas" class="font-medium"></span></div>
+          <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Email</span><span id="res-email" class="font-medium"></span></div>
+          <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Jawaban Benar</span><span id="res-benar" class="font-medium"></span></div>
+          <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Percobaan</span><span id="res-percobaan" class="font-medium"></span></div>
+          <div class="flex justify-between px-5 py-3"><span class="text-neutral-500">Pelanggaran Terdeteksi</span><span id="res-pelanggaran" class="font-medium text-red-600">0 kali</span></div>
+        </div>
+
+        <div class="mt-6 bg-gradient-to-r from-purple-600 to-violet-500 rounded-xl py-6">
+          <p class="text-purple-100 text-sm">Skor Akhir</p>
+          <p id="res-skor" class="text-white text-4xl font-bold mt-1">0</p>
+        </div>
+
+        <p id="save-status" class="text-xs text-neutral-400 mt-4"></p>
+
+        <!-- Tombol ulangi soal -->
+        <div id="retry-container" class="mt-6 hidden">
+          <button id="btn-retry"
+            class="w-full bg-white border-2 border-purple-600 text-purple-600 font-semibold py-3 rounded-lg hover:bg-purple-50 transition">
+            🔄 Ulangi Soal (Kesempatan ke-2)
+          </button>
+          <p class="text-xs text-neutral-400 mt-2">Kamu punya 1 kali kesempatan mengulang tanpa perlu izin admin lagi.</p>
+        </div>
+
+        <!-- Pembahasan -->
+        <div id="pembahasan-container" class="mt-8 hidden text-left">
+          <h3 class="text-lg font-semibold text-neutral-800 mb-4">📖 Pembahasan Jawaban</h3>
+          <div id="pembahasan-list" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================= FIREBASE (MODULAR v10) ========================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      doc,
+      updateDoc,
+      arrayUnion,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJENdjNPj4b9G2nzl1X-C12iTv_oZpTl4",
+      authDomain: "kuis-mtk-app.firebaseapp.com",
+      projectId: "kuis-mtk-app",
+      storageBucket: "kuis-mtk-app.firebasestorage.app",
+      messagingSenderId: "546398118889",
+      appId: "1:546398118889:web:4185b0dbb1fdb46b2ca178"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const KOLEKSI = "peserta";
+    const MAX_PERCOBAAN = 2;
+
+    // ============================================================
+    // BANK SOAL — tinggal tambahkan objek baru ke array ini untuk
+    // menambah soal (tidak dibatasi 20, bisa berapapun jumlahnya).
+    // Format: { question, options: [4 opsi], answer: index jawaban benar (0-3) }
+    // ============================================================
+    const soalList = [
+   { question: "Sebuah tabung memiliki jari-jari 7 cm dan tinggi 10 cm. Jika π = 22/7, luas permukaan tabung tersebut adalah ....", options: ["616 cm²", "704 cm²", "748 cm²", "792 cm²"], answer: 2 },
+  { question: "Sebuah tabung mempunyai diameter 14 cm dan tinggi 20 cm. Volume tabung tersebut adalah ....", options: ["2.640 cm³", "3.080 cm³", "3.520 cm³", "4.400 cm³"], answer: 1 },
+  { question: "Sebuah kaleng berbentuk tabung memiliki jari-jari 10 cm dan tinggi 15 cm. Jika π = 3,14, volumenya adalah ....", options: ["4.710 cm³", "4.810 cm³", "5.710 cm³", "6.280 cm³"], answer: 0 },
+  { question: "Sebuah tabung memiliki volume 1.540 cm³. Jika jari-jarinya 7 cm dan π = 22/7, tinggi tabung tersebut adalah ....", options: ["8 cm", "10 cm", "12 cm", "14 cm"], answer: 1 },
+  { question: "Sebuah drum berbentuk tabung memiliki diameter 60 cm dan tinggi 100 cm. Jika π = 3,14, volume maksimum drum tersebut adalah ....", options: ["282.600 cm³", "314.000 cm³", "282.000 cm³", "376.800 cm³"], answer: 0 },
+  { question: "Sebuah tabung berjari-jari 7 cm memiliki tinggi 12 cm. Luas selimut tabung tersebut adalah ....", options: ["264 cm²", "352 cm²", "528 cm²", "616 cm²"], answer: 2 },
+  { question: "Sebuah tabung mempunyai jari-jari 14 cm dan tinggi 10 cm. Jika π = 22/7, luas permukaan tabung adalah ....", options: ["1.056 cm²", "2.112 cm²", "2.464 cm²", "3.080 cm²"], answer: 1 },
+  { question: "Sebuah kerucut memiliki jari-jari alas 7 cm dan tinggi 24 cm. Panjang garis pelukis kerucut tersebut adalah ....", options: ["23 cm", "24 cm", "25 cm", "26 cm"], answer: 2 },
+  { question: "Sebuah kerucut mempunyai jari-jari 7 cm dan tinggi 24 cm. Jika π = 22/7, volume kerucut tersebut adalah ....", options: ["1.056 cm³", "1.232 cm³", "1.540 cm³", "1.848 cm³"], answer: 1 },
+  { question: "Sebuah kerucut memiliki jari-jari 14 cm dan garis pelukis 20 cm. Luas selimut kerucut tersebut adalah .... Gunakan π = 22/7.", options: ["440 cm²", "616 cm²", "880 cm²", "1.232 cm²"], answer: 2 },
+  { question: "Sebuah kerucut mempunyai luas alas 154 cm² dan tinggi 12 cm. Volume kerucut tersebut adalah ....", options: ["308 cm³", "462 cm³", "616 cm³", "924 cm³"], answer: 1 },
+  { question: "Sebuah topi ulang tahun berbentuk kerucut memiliki diameter 14 cm dan tinggi 24 cm. Volume ruang di dalam topi tersebut adalah .... Gunakan π = 22/7.", options: ["616 cm³", "784 cm³", "1.232 cm³", "1.540 cm³"], answer: 2 },
+  { question: "Sebuah bola mempunyai jari-jari 7 cm. Jika π = 22/7, luas permukaan bola tersebut adalah ....", options: ["154 cm²", "308 cm²", "616 cm²", "1.232 cm²"], answer: 2 },
+  { question: "Volume sebuah bola dengan jari-jari 6 cm adalah .... Gunakan π = 3,14.", options: ["452,16 cm³", "904,32 cm³", "1.130,40 cm³", "1.256,00 cm³"], answer: 1 },
+  { question: "Sebuah bola memiliki diameter 14 cm. Luas permukaan bola tersebut adalah .... Gunakan π = 22/7.", options: ["308 cm²", "616 cm²", "784 cm²", "1.232 cm²"], answer: 1 },
+  { question: "Dua buah bola mempunyai perbandingan jari-jari 2 : 3. Perbandingan volume kedua bola tersebut adalah ....", options: ["2 : 3", "4 : 9", "6 : 9", "8 : 27"], answer: 3 },
+  { question: "Sebuah bola berjari-jari 6 cm dimasukkan seluruhnya ke dalam tabung yang berjari-jari 6 cm dan tinggi 20 cm. Volume ruang dalam tabung yang tidak ditempati bola adalah .... Gunakan π = 3,14.", options: ["1.356,48 cm³", "2.034,72 cm³", "2.260,80 cm³", "2.486,88 cm³"], answer: 0 },
+  { question: "Sebuah bak air berbentuk tabung mempunyai jari-jari 70 cm dan tinggi 100 cm. Jika bak terisi penuh, banyak air di dalam bak adalah .... liter. Gunakan π = 22/7.", options: ["1.400 liter", "1.540 liter", "1.600 liter", "1.750 liter"], answer: 1 },
+  { question: "Sebuah benda berbentuk bola memiliki volume 36π cm³. Jari-jari bola tersebut adalah ....", options: ["2 cm", "3 cm", "4 cm", "6 cm"], answer: 1 },
+    { question: "Sebuah tempat pensil berbentuk gabungan tabung dan setengah bola. Jari-jari keduanya 7 cm. Tinggi bagian tabung 20 cm. Jika π = 22/7, volume seluruh bangun tersebut adalah ....", options: ["3.798,67 cm³", "4.004 cm³", "4.312 cm³", "4.620 cm³"], answer: 0 }
+    ];
+
+    let userData = { nama: "", kelas: "", email: "" };
+    let userAnswers = new Array(soalList.length).fill(null);
+    let currentIndex = 0;
+    let maxReachedIndex = 0;
+    let sessionId = null;
+    let percobaanKe = 1;
+
+    let isExamActive = false;
+    let violationCount = 0;
+    let lastViolationTime = 0;
+
+    const WAKTU_PER_SOAL = 180; // detik (3 menit)
+    let questionTimerInterval = null;
+    let timeLeft = WAKTU_PER_SOAL;
+
+    const sectionForm = document.getElementById("section-form");
+    const sectionQuiz = document.getElementById("section-quiz");
+    const sectionResult = document.getElementById("section-result");
+    const questionCard = document.getElementById("question-card");
+    const questionPalette = document.getElementById("question-palette");
+    const qCurrentEl = document.getElementById("q-current");
+    const qTotalEl = document.getElementById("q-total");
+    const progressLabel = document.getElementById("progress-label");
+    const progressBar = document.getElementById("progress-bar");
+    const attemptLabel = document.getElementById("attempt-label");
+    const btnDaftar = document.getElementById("btn-daftar");
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    const retryContainer = document.getElementById("retry-container");
+    const pembahasanContainer = document.getElementById("pembahasan-container");
+    const pembahasanList = document.getElementById("pembahasan-list");
+
+    qTotalEl.textContent = soalList.length;
+
+    function showOnly(section) {
+      [sectionForm, sectionQuiz, sectionResult].forEach(s => s.classList.add("hidden"));
+      section.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ========================= LOCKDOWN & PENCATATAN INSTAN =========================
+
+    function enterFullscreen() {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => console.log(err));
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+    }
+
+    function exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.log(err));
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+
+    function lockScreen() {
+      isExamActive = true;
+      enterFullscreen();
+
+      if (navigator.keyboard && navigator.keyboard.lock) {
+        navigator.keyboard.lock(["Escape", "Tab", "MetaLeft", "MetaRight", "AltLeft", "AltRight"]);
+      }
+    }
+
+    function unlockScreen() {
+      isExamActive = false;
+      exitFullscreen();
+
+      if (navigator.keyboard && navigator.keyboard.unlock) {
+        navigator.keyboard.unlock();
+      }
+    }
+
+    async function handleViolation(jenisPelanggaran) {
+      if (!isExamActive || !sessionId) return;
+
+      const now = Date.now();
+      if (now - lastViolationTime < 1500) return;
+      lastViolationTime = now;
+
+      violationCount++;
+      const timeString = new Date().toLocaleTimeString('id-ID');
+
+      document.getElementById("cheat-count").textContent = violationCount;
+      document.getElementById("cheat-warning").classList.remove("hidden");
+
+      try {
+        const sessionRef = doc(db, KOLEKSI, sessionId);
+        await updateDoc(sessionRef, {
+          pelanggaran: violationCount,
+          riwayat_pelanggaran: arrayUnion({
+            jenis: jenisPelanggaran,
+            waktu: timeString,
+            percobaan: percobaanKe
+          })
+        });
+      } catch (err) {
+        console.error("Gagal mengirim log kecurangan instan:", err);
+      }
+
+      setTimeout(() => {
+        if (isExamActive && !document.fullscreenElement) {
+          enterFullscreen();
+        }
+      }, 800);
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && isExamActive) {
+        handleViolation("Ganti Tab / Minimize Browser");
+      }
+    });
+
+    window.addEventListener("blur", () => {
+      if (isExamActive) {
+        handleViolation("Layar Kehilangan Fokus (Out of Focus)");
+      }
+    });
+
+    document.addEventListener("contextmenu", (e) => {
+      if (isExamActive) e.preventDefault();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!isExamActive) return;
+
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
+        (e.ctrlKey && (e.key === "u" || e.key === "c" || e.key === "v" || e.key === "a")) ||
+        e.key === "Alt" ||
+        e.key === "Meta"
+      ) {
+        e.preventDefault();
+        handleViolation(`Pencetan Shortcut Dilarang (${e.key})`);
+      }
+    });
+
+    // ========================= TIMER PER SOAL =========================
+
+    function formatWaktu(detik) {
+      const m = Math.floor(detik / 60).toString().padStart(2, "0");
+      const s = (detik % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function updateTimerDisplay() {
+      const timerEl = document.getElementById("question-timer");
+      if (!timerEl) return;
+      timerEl.textContent = formatWaktu(timeLeft);
+      timerEl.classList.remove("text-neutral-500", "text-amber-600", "text-red-600", "animate-pulse");
+      if (timeLeft <= 10) {
+        timerEl.classList.add("text-red-600", "animate-pulse");
+      } else if (timeLeft <= 30) {
+        timerEl.classList.add("text-amber-600");
+      } else {
+        timerEl.classList.add("text-neutral-500");
+      }
+    }
+
+    function clearQuestionTimer() {
+      if (questionTimerInterval) {
+        clearInterval(questionTimerInterval);
+        questionTimerInterval = null;
+      }
+    }
+
+    function startQuestionTimer() {
+      clearQuestionTimer();
+      timeLeft = WAKTU_PER_SOAL;
+      updateTimerDisplay();
+      questionTimerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearQuestionTimer();
+          handleTimeUp();
+        }
+      }, 1000);
+    }
+
+    function handleTimeUp() {
+      // Waktu untuk soal ini habis. Soal yang belum dijawab tetap null
+      // (dihitung tidak menjawab / bernilai 0), lalu otomatis lanjut ke soal berikutnya.
+      if (currentIndex < soalList.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        submitQuiz();
+      }
+    }
+
+    // ========================= TAMPILAN SATU SOAL (STYLE OSN ONLINE) =========================
+
+    function renderQuestion() {
+      const soal = soalList[currentIndex];
+      const selected = userAnswers[currentIndex];
+
+      maxReachedIndex = Math.max(maxReachedIndex, currentIndex);
+      qCurrentEl.textContent = currentIndex + 1;
+
+      questionCard.innerHTML = `
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-medium text-neutral-400">⏱ Waktu tersisa untuk soal ini</span>
+          <span id="question-timer" class="text-lg font-bold tabular-nums text-neutral-500">03:00</span>
+        </div>
+        <p class="font-medium text-neutral-800 mb-4 text-base">${currentIndex + 1}. ${soal.question}</p>
+        <div class="grid sm:grid-cols-2 gap-2">
+          ${soal.options.map((opt, oIndex) => `
+            <label class="option-label flex items-center gap-2 border border-neutral-300 rounded-lg px-3 py-2.5 cursor-pointer hover:bg-neutral-50 transition text-sm">
+              <input type="radio" name="current-question" value="${oIndex}" class="accent-purple-600"
+                ${selected === oIndex ? "checked" : ""} onchange="window.__setAnswer(${oIndex})" />
+              <span>${opt}</span>
+            </label>
+          `).join("")}
+        </div>
+      `;
+
+      btnPrev.disabled = currentIndex === 0;
+      btnNext.textContent = currentIndex === soalList.length - 1 ? "Selesai →" : "Selanjutnya →";
+
+      renderPalette();
+      updateProgress();
+      startQuestionTimer();
+    }
+
+    function renderPalette() {
+      questionPalette.innerHTML = soalList.map((_, i) => {
+        const answered = userAnswers[i] !== null;
+        const isCurrent = i === currentIndex;
+        const isReached = i <= maxReachedIndex;
+        let cls = "palette-btn rounded-lg text-xs font-semibold flex items-center justify-center transition border cursor-default select-none ";
+        if (isCurrent) {
+          cls += "bg-purple-600 text-white border-purple-600 ring-2 ring-offset-1 ring-purple-600";
+        } else if (!isReached) {
+          cls += "bg-neutral-50 text-neutral-300 border-neutral-200";
+        } else if (answered) {
+          cls += "bg-purple-100 text-purple-700 border-purple-300";
+        } else {
+          cls += "bg-white text-neutral-500 border-neutral-300";
+        }
+        return `<div class="btn-palette ${cls}">${i + 1}</div>`;
+      }).join("");
+    }
+
+    function updateProgress() {
+      const answered = userAnswers.filter(a => a !== null).length;
+      progressLabel.textContent = `${answered} / ${soalList.length} terjawab`;
+      progressBar.style.width = `${(answered / soalList.length) * 100}%`;
+    }
+
+    window.__setAnswer = function (oIndex) {
+      userAnswers[currentIndex] = oIndex;
+      renderPalette();
+      updateProgress();
+    };
+
+    // Palet soal kini hanya sebagai indikator progres (tidak bisa diklik / tidak bisa loncat soal).
+
+    btnPrev.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    });
+
+    btnNext.addEventListener("click", () => {
+      if (currentIndex < soalList.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        submitQuiz();
+      }
+    });
+
+    function mulaiKuis() {
+      currentIndex = 0;
+      maxReachedIndex = 0;
+      renderQuestion();
+      attemptLabel.classList.toggle("hidden", percobaanKe < 2);
+      showOnly(sectionQuiz);
+      lockScreen();
+    }
+
+    // STEP 1 -> LANGSUNG MULAI KUIS (tanpa menunggu izin admin)
+    document.getElementById("form-data-diri").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      userData.nama = document.getElementById("nama").value.trim();
+      userData.kelas = document.getElementById("kelas").value.trim();
+      userData.email = document.getElementById("email").value.trim();
+
+      btnDaftar.disabled = true;
+      btnDaftar.textContent = "Menyiapkan kuis...";
+
+      try {
+        const docRef = await addDoc(collection(db, KOLEKSI), {
+          nama: userData.nama,
+          kelas: userData.kelas,
+          email: userData.email,
+          status: "mengerjakan",
+          percobaan: 1,
+          pelanggaran: 0,
+          riwayat_pelanggaran: [],
+          waktu_daftar: serverTimestamp()
+        });
+        sessionId = docRef.id;
+
+        mulaiKuis();
+      } catch (err) {
+        console.error("Gagal mendaftar:", err);
+        alert("Gagal mengirim data. Periksa koneksi/konfigurasi Firebase lalu coba lagi.");
+        btnDaftar.disabled = false;
+        btnDaftar.textContent = "Mulai Kuis →";
+      }
+    });
+
+    // SUBMIT KUIS
+    async function submitQuiz() {
+      clearQuestionTimer();
+
+      const unanswered = userAnswers.filter(a => a === null).length;
+      if (unanswered > 0) {
+        const lanjut = confirm(`Masih ada ${unanswered} soal belum dijawab. Tetap submit?`);
+        if (!lanjut) {
+          // lanjutkan mengerjakan soal saat ini, timer dimulai ulang
+          startQuestionTimer();
+          return;
+        }
+      }
+
+      unlockScreen();
+
+      let benar = 0;
+      soalList.forEach((soal, i) => {
+        if (userAnswers[i] === soal.answer) benar++;
+      });
+      const skorAkhir = Math.round((benar / soalList.length) * 100);
+
+      document.getElementById("res-nama").textContent = userData.nama;
+      document.getElementById("res-kelas").textContent = userData.kelas;
+      document.getElementById("res-email").textContent = userData.email;
+      document.getElementById("res-benar").textContent = `${benar} / ${soalList.length}`;
+      document.getElementById("res-percobaan").textContent = `${percobaanKe} / ${MAX_PERCOBAAN}`;
+      document.getElementById("res-pelanggaran").textContent = `${violationCount} kali`;
+      document.getElementById("res-skor").textContent = skorAkhir;
+
+      const bisaUlangi = percobaanKe < MAX_PERCOBAAN;
+      retryContainer.classList.toggle("hidden", !bisaUlangi);
+      pembahasanContainer.classList.toggle("hidden", bisaUlangi);
+      if (!bisaUlangi) renderPembahasan();
+
+      showOnly(sectionResult);
+
+      const statusEl = document.getElementById("save-status");
+      try {
+        if (sessionId) {
+          await updateDoc(doc(db, KOLEKSI, sessionId), {
+            status: "selesai",
+            percobaan: percobaanKe,
+            jumlah_benar: benar,
+            skor: skorAkhir,
+            pelanggaran: violationCount,
+            waktu_selesai: serverTimestamp()
+          });
+        }
+        statusEl.textContent = "✅ Hasil berhasil disimpan ke database.";
+      } catch (err) {
+        console.error("Gagal menyimpan ke Firestore:", err);
+        statusEl.textContent = "⚠️ Gagal menyimpan hasil. Periksa konfigurasi Firebase.";
+      }
+    }
+
+    document.getElementById("btn-submit-quiz").addEventListener("click", submitQuiz);
+
+    // RE-TRY / ULANGI SOAL
+    document.getElementById("btn-retry").addEventListener("click", async () => {
+      if (percobaanKe >= MAX_PERCOBAAN) return;
+      percobaanKe += 1;
+      userAnswers = new Array(soalList.length).fill(null);
+
+      try {
+        if (sessionId) {
+          await updateDoc(doc(db, KOLEKSI, sessionId), {
+            status: "mengerjakan",
+            percobaan: percobaanKe
+          });
+        }
+      } catch (err) {
+        console.error("Gagal memperbarui status percobaan:", err);
+      }
+
+      mulaiKuis();
+    });
+
+    function renderPembahasan() {
+      pembahasanList.innerHTML = soalList.map((soal, i) => {
+        const jawabanUser = userAnswers[i];
+        const benar = jawabanUser === soal.answer;
+        return `
+          <div class="border border-neutral-200 rounded-xl p-4">
+            <p class="font-medium text-neutral-800 mb-2">${i + 1}. ${soal.question}</p>
+            <div class="grid sm:grid-cols-2 gap-2 text-sm">
+              ${soal.options.map((opt, oIndex) => {
+                let cls = "border-neutral-200 text-neutral-600";
+                let icon = "";
+                if (oIndex === soal.answer) {
+                  cls = "border-green-500 bg-green-50 text-green-700 font-medium";
+                  icon = " ✔";
+                } else if (oIndex === jawabanUser) {
+                  cls = "border-red-400 bg-red-50 text-red-600";
+                  icon = " ✘";
+                }
+                return `<div class="rounded-lg border px-3 py-2 ${cls}">${opt}${icon}</div>`;
+              }).join("")}
+            </div>
+            <p class="text-xs mt-2 ${benar ? "text-green-600" : "text-red-500"}">
+              ${benar ? "Jawabanmu benar." : `Jawabanmu ${jawabanUser === null ? "kosong" : "salah"}, jawaban yang benar adalah "${soal.options[soal.answer]}".`}
+            </p>
+          </div>
+        `;
+      }).join("");
+    }
+  </script>
+</body>
+</html>
