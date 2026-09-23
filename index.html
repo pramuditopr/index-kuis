@@ -1,5 +1,5 @@
 <!DOCTYPE html>
- <html lang="id">
+<html lang="id">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -70,7 +70,6 @@
             <h2 class="text-xl font-semibold text-neutral-800">Soal <span id="q-current">1</span> dari <span id="q-total">20</span></h2>
             <span id="progress-label" class="text-sm text-neutral-500">0 / 20 terjawab</span>
           </div>
-          <p id="attempt-label" class="text-xs text-purple-600 font-medium mb-4 hidden">🔄 Ini adalah kesempatan ke-2 (terakhir) kamu mengerjakan kuis ini.</p>
           <div class="w-full bg-neutral-200 rounded-full h-2 mb-6">
             <div id="progress-bar" class="bg-gradient-to-r from-purple-600 to-violet-500 h-2 rounded-full transition-all" style="width:0%"></div>
           </div>
@@ -137,15 +136,6 @@
 
         <p id="save-status" class="text-xs text-neutral-400 mt-4"></p>
 
-        <!-- Tombol ulangi soal -->
-        <div id="retry-container" class="mt-6 hidden">
-          <button id="btn-retry"
-            class="w-full bg-white border-2 border-purple-600 text-purple-600 font-semibold py-3 rounded-lg hover:bg-purple-50 transition">
-            🔄 Ulangi Soal (Kesempatan ke-2)
-          </button>
-          <p class="text-xs text-neutral-400 mt-2">Kamu punya 1 kali kesempatan mengulang tanpa perlu izin admin lagi.</p>
-        </div>
-
         <!-- Pembahasan -->
         <div id="pembahasan-container" class="mt-8 hidden text-left">
           <h3 class="text-lg font-semibold text-neutral-800 mb-4">📖 Pembahasan Jawaban</h3>
@@ -181,7 +171,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const KOLEKSI = "peserta";
-    const MAX_PERCOBAAN = 2;
+    const MAX_PERCOBAAN = 1;
 
     // ============================================================
     // BANK SOAL — tinggal tambahkan objek baru ke array ini untuk
@@ -190,7 +180,7 @@
     // ============================================================
     const soalList = [
    { question: "Sebuah tabung memiliki jari-jari 7 cm dan tinggi 10 cm. Jika π = 22/7, luas permukaan tabung tersebut adalah ....", options: ["616 cm²", "704 cm²", "748 cm²", "792 cm²"], answer: 2 },
-  { question: "Sebuah tabung mempunyai diameter 14 cm dan tinggi 20 cm. Volume tabung tersebut adalah ....", options: ["2.640 cm³", "3.080 cm³", "3.520 cm³", "4.400 cm³"], answer: 1 },
+  { question: "Sebuah tabung mempunyai diameter 14 cm dan tinggi 20 cm. Volume tabung tersebut adalah ....", options: ["2.640 cm³", "3.080 cm³", "3.520 cm³", "4.400 cm³"], answer: 2 },
   { question: "Sebuah kaleng berbentuk tabung memiliki jari-jari 10 cm dan tinggi 15 cm. Jika π = 3,14, volumenya adalah ....", options: ["4.710 cm³", "4.810 cm³", "5.710 cm³", "6.280 cm³"], answer: 0 },
   { question: "Sebuah tabung memiliki volume 1.540 cm³. Jika jari-jarinya 7 cm dan π = 22/7, tinggi tabung tersebut adalah ....", options: ["8 cm", "10 cm", "12 cm", "14 cm"], answer: 1 },
   { question: "Sebuah drum berbentuk tabung memiliki diameter 60 cm dan tinggi 100 cm. Jika π = 3,14, volume maksimum drum tersebut adalah ....", options: ["282.600 cm³", "314.000 cm³", "282.000 cm³", "376.800 cm³"], answer: 0 },
@@ -205,10 +195,10 @@
   { question: "Volume sebuah bola dengan jari-jari 6 cm adalah .... Gunakan π = 3,14.", options: ["452,16 cm³", "904,32 cm³", "1.130,40 cm³", "1.256,00 cm³"], answer: 1 },
   { question: "Sebuah bola memiliki diameter 14 cm. Luas permukaan bola tersebut adalah .... Gunakan π = 22/7.", options: ["308 cm²", "616 cm²", "784 cm²", "1.232 cm²"], answer: 1 },
   { question: "Dua buah bola mempunyai perbandingan jari-jari 2 : 3. Perbandingan volume kedua bola tersebut adalah ....", options: ["2 : 3", "4 : 9", "6 : 9", "8 : 27"], answer: 3 },
-  { question: "Sebuah bola berjari-jari 6 cm dimasukkan seluruhnya ke dalam tabung yang berjari-jari 6 cm dan tinggi 20 cm. Volume ruang dalam tabung yang tidak ditempati bola adalah .... Gunakan π = 3,14.", options: ["1.356,48 cm³", "2.034,72 cm³", "2.260,80 cm³", "2.486,88 cm³"], answer: 0 },
+  { question: "Sebuah bola berjari-jari 6 cm dimasukkan seluruhnya ke dalam tabung yang berjari-jari 6 cm dan tinggi 20 cm. Volume ruang dalam tabung yang tidak ditempati bola adalah .... Gunakan π = 3,14.", options: ["1.808,64 cm³", "2.034,72 cm³", "2.260,80 cm³", "2.486,88 cm³"], answer: 2 },
   { question: "Sebuah bak air berbentuk tabung mempunyai jari-jari 70 cm dan tinggi 100 cm. Jika bak terisi penuh, banyak air di dalam bak adalah .... liter. Gunakan π = 22/7.", options: ["1.400 liter", "1.540 liter", "1.600 liter", "1.750 liter"], answer: 1 },
   { question: "Sebuah benda berbentuk bola memiliki volume 36π cm³. Jari-jari bola tersebut adalah ....", options: ["2 cm", "3 cm", "4 cm", "6 cm"], answer: 1 },
-    { question: "Sebuah tempat pensil berbentuk gabungan tabung dan setengah bola. Jari-jari keduanya 7 cm. Tinggi bagian tabung 20 cm. Jika π = 22/7, volume seluruh bangun tersebut adalah ....", options: ["3.798,67 cm³", "4.004 cm³", "4.312 cm³", "4.620 cm³"], answer: 0 }
+    { question: "Sebuah tempat pensil berbentuk gabungan tabung dan setengah bola. Jari-jari keduanya 7 cm. Tinggi bagian tabung 20 cm. Jika π = 22/7, volume seluruh bangun tersebut adalah ....", options: ["3.696 cm³", "4.004 cm³", "4.312 cm³", "4.620 cm³"], answer: 0 }
     ];
 
     let userData = { nama: "", kelas: "", email: "" };
@@ -235,11 +225,9 @@
     const qTotalEl = document.getElementById("q-total");
     const progressLabel = document.getElementById("progress-label");
     const progressBar = document.getElementById("progress-bar");
-    const attemptLabel = document.getElementById("attempt-label");
     const btnDaftar = document.getElementById("btn-daftar");
     const btnPrev = document.getElementById("btn-prev");
     const btnNext = document.getElementById("btn-next");
-    const retryContainer = document.getElementById("retry-container");
     const pembahasanContainer = document.getElementById("pembahasan-container");
     const pembahasanList = document.getElementById("pembahasan-list");
 
@@ -498,7 +486,6 @@
       currentIndex = 0;
       maxReachedIndex = 0;
       renderQuestion();
-      attemptLabel.classList.toggle("hidden", percobaanKe < 2);
       showOnly(sectionQuiz);
       lockScreen();
     }
@@ -565,10 +552,8 @@
       document.getElementById("res-pelanggaran").textContent = `${violationCount} kali`;
       document.getElementById("res-skor").textContent = skorAkhir;
 
-      const bisaUlangi = percobaanKe < MAX_PERCOBAAN;
-      retryContainer.classList.toggle("hidden", !bisaUlangi);
-      pembahasanContainer.classList.toggle("hidden", bisaUlangi);
-      if (!bisaUlangi) renderPembahasan();
+      pembahasanContainer.classList.remove("hidden");
+      renderPembahasan();
 
       showOnly(sectionResult);
 
@@ -592,26 +577,6 @@
     }
 
     document.getElementById("btn-submit-quiz").addEventListener("click", submitQuiz);
-
-    // RE-TRY / ULANGI SOAL
-    document.getElementById("btn-retry").addEventListener("click", async () => {
-      if (percobaanKe >= MAX_PERCOBAAN) return;
-      percobaanKe += 1;
-      userAnswers = new Array(soalList.length).fill(null);
-
-      try {
-        if (sessionId) {
-          await updateDoc(doc(db, KOLEKSI, sessionId), {
-            status: "mengerjakan",
-            percobaan: percobaanKe
-          });
-        }
-      } catch (err) {
-        console.error("Gagal memperbarui status percobaan:", err);
-      }
-
-      mulaiKuis();
-    });
 
     function renderPembahasan() {
       pembahasanList.innerHTML = soalList.map((soal, i) => {
@@ -644,3 +609,4 @@
   </script>
 </body>
 </html>
+
